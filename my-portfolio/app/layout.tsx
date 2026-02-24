@@ -13,8 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Eugene Cho — Portfolio",
-  description: "Personal portfolio of Eugene Cho — developer, builder, creator.",
+  title: "Eugene Cho | AI Tech Lead",
+  description:
+    "Resume portfolio for Eugene Taehyun Cho, AI Tech Lead focused on enterprise generative AI solutions.",
 };
 
 export default function RootLayout({

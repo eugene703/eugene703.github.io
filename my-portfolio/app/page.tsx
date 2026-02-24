@@ -1,161 +1,368 @@
-const projects = [
-  {
-    title: "Project One",
-    description:
-      "A brief description of the project, what it does, and the technologies used.",
-    link: "#",
-    tags: ["React", "TypeScript", "Tailwind"],
-  },
-  {
-    title: "Project Two",
-    description:
-      "Another project description. Replace this with real content when ready.",
-    link: "#",
-    tags: ["Next.js", "Node.js", "PostgreSQL"],
-  },
-  {
-    title: "Project Three",
-    description:
-      "One more project to showcase. Add as many as you like by extending this array.",
-    link: "#",
-    tags: ["Python", "FastAPI", "Docker"],
-  },
-];
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import { companies, featuredProjects, substack } from "./data/siteContent";
+
+type LatestPost = {
+  title: string;
+  link: string;
+  publishedAt: string;
+  summary: string;
+};
+
+function formatPublishedDate(value: string): string {
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return "Recent";
+  }
+
+  return parsed.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
 
 export default function Home() {
+  const [activeProject, setActiveProject] = useState<
+    (typeof featuredProjects)[number] | null
+  >(null);
+  const [latestPosts, setLatestPosts] = useState<LatestPost[]>([]);
+  const [isLoadingPosts, setIsLoadingPosts] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+
+    async function loadLatestSubstackPosts() {
+      try {
+        const response = await fetch("/api/substack?limit=3");
+        const data = (await response.json()) as {
+          posts?: LatestPost[];
+        };
+
+        if (mounted && Array.isArray(data.posts)) {
+          setLatestPosts(data.posts);
+        }
+      } catch {
+        if (mounted) {
+          setLatestPosts([]);
+        }
+      } finally {
+        if (mounted) {
+          setIsLoadingPosts(false);
+        }
+      }
+    }
+
+    void loadLatestSubstackPosts();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
   return (
-    <div className="flex min-h-screen justify-center bg-background font-sans text-foreground">
-      <main className="w-full max-w-2xl px-6 py-24 sm:py-32">
-        {/* Header */}
-        <header className="mb-16">
-          <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
-            Eugene Cho
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top_right,_#e9eef5_0%,_#e5e0d7_52%,_#ddd5ca_100%)] text-zinc-900">
+      <main className="mx-auto w-full max-w-5xl px-6 py-14 sm:px-10 sm:py-20">
+        <header className="rounded-2xl border border-zinc-300/80 bg-[#f3efe8]/85 p-8 shadow-[0_10px_30px_-20px_rgba(0,0,0,0.55)] backdrop-blur-sm sm:p-10">
+          <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-5xl">
+            Eugene Taehyun Cho
           </h1>
-          <p className="mt-4 text-lg leading-relaxed text-zinc-600 dark:text-zinc-400">
-            Developer &amp; builder. I create things for the web and beyond.
-            Currently exploring new ideas and shipping projects.
-          </p>
-          <nav className="mt-6 flex gap-5 text-sm font-medium">
+          <p className="mt-3 text-sm font-medium text-zinc-600">
+            Current:{" "}
             <a
-              href="https://github.com/eugenecho"
+              href="https://rosenblatt.ai"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-zinc-500 transition-colors hover:text-foreground dark:text-zinc-400"
+              className="text-zinc-700 underline decoration-zinc-400 underline-offset-2 transition hover:text-amber-700"
             >
-              GitHub
-            </a>
+              Rosenblatt AI
+            </a>{" "}
+            · AI Tech Lead - AI Solutioning
+          </p>
+          <p className="mt-5 max-w-3xl text-base leading-relaxed text-zinc-700 sm:text-lg">
+            AI Tech Lead at Rosenblatt AI, focused on turning ambiguous business
+            problems into practical, high-impact products. I build and deploy AI
+            systems that teams actually adopt.
+          </p>
+
+          <div className="mt-7 flex flex-wrap gap-3 text-sm">
+            <span className="rounded-full border border-zinc-400/70 bg-[#ebe5da] px-3 py-1.5 text-zinc-700">
+              New York, NY
+            </span>
             <a
-              href="https://linkedin.com/in/"
+              href="https://linkedin.com/in/eugenetcho/"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-zinc-500 transition-colors hover:text-foreground dark:text-zinc-400"
+              className="rounded-full border border-zinc-400/70 bg-[#ebe5da] px-3 py-1.5 text-zinc-700 transition hover:border-zinc-600 hover:text-zinc-900"
             >
               LinkedIn
             </a>
             <a
-              href="mailto:hello@example.com"
-              className="text-zinc-500 transition-colors hover:text-foreground dark:text-zinc-400"
+              href={substack.publicationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-full border border-zinc-400/70 bg-[#ebe5da] px-3 py-1.5 text-zinc-700 transition hover:border-zinc-600 hover:text-zinc-900"
             >
-              Email
+              Substack
             </a>
-          </nav>
+          </div>
         </header>
 
-        {/* About */}
-        <section className="mb-16">
-          <h2 className="mb-4 text-sm font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-            About
+        <section className="mt-14 rounded-xl border border-zinc-300/85 bg-[#f2eee6]/85 p-6 sm:p-8">
+          <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-zinc-500">
+            About Me
           </h2>
-          <p className="leading-relaxed text-zinc-700 dark:text-zinc-300">
-            Replace this with a paragraph about yourself — your background,
-            interests, what you&apos;re working on, and what drives you. Keep it
-            honest and concise.
-          </p>
+          <div className="mt-4 space-y-4 text-sm leading-relaxed text-zinc-700 sm:text-base">
+            <p>
+              I solve complex business problems with AI by turning ambiguity
+              into clear, high-impact solutions. As an AI Team Lead, I own
+              initiatives end-to-end, from identifying the right problems to
+              deploying production systems that materially improve how
+              organizations operate.
+            </p>
+            <p>
+              I focus on applying AI where it drives measurable outcomes,
+              embedding it into core workflows and optimizing for performance,
+              cost, and scalability. My background spans consulting, startup,
+              and trading environments, with hands-on delivery across AWS, GCP,
+              and Azure.
+            </p>
+          </div>
+
+          <div className="mt-6">
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+              Previously At
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2.5">
+              {companies.map((company) => (
+                <a
+                  key={company.name}
+                  href={company.link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="rounded-full border border-zinc-400/80 bg-[#ebe5da] px-3 py-1.5 text-sm text-zinc-700 transition hover:border-zinc-600 hover:text-zinc-900"
+                >
+                  {company.name}
+                </a>
+              ))}
+            </div>
+          </div>
         </section>
 
-        {/* Projects */}
-        <section className="mb-16">
-          <h2 className="mb-6 text-sm font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-            Projects
-          </h2>
-          <div className="flex flex-col gap-8">
-            {projects.map((project) => (
-              <a
+        <section className="mt-14">
+          <div className="flex items-end justify-between gap-4">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-zinc-500">
+              Featured Projects
+            </h2>
+            <Link
+              href="/projects"
+              className="text-sm font-medium text-amber-700 hover:text-amber-800"
+            >
+              View all
+            </Link>
+          </div>
+          <p className="mt-2 text-xs font-medium uppercase tracking-wide text-zinc-500">
+            Click a card to open full project details
+          </p>
+
+          <div className="mt-5 grid gap-5 md:grid-cols-3">
+            {featuredProjects.map((project) => (
+              <button
                 key={project.title}
-                href={project.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group -mx-4 rounded-lg p-4 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-900"
+                type="button"
+                onClick={() => setActiveProject(project)}
+                className="rounded-xl border border-zinc-300/85 bg-[#f2eee6]/85 p-5 text-left shadow-[0_10px_24px_-22px_rgba(0,0,0,0.8)] transition hover:border-zinc-500 hover:shadow-[0_12px_30px_-24px_rgba(0,0,0,0.85)]"
               >
-                <h3 className="font-semibold group-hover:text-black dark:group-hover:text-white">
+                <h3 className="text-base font-semibold text-zinc-900">
                   {project.title}
-                  <span className="ml-1 inline-block transition-transform group-hover:translate-x-0.5">
-                    &rarr;
-                  </span>
                 </h3>
-                <p className="mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                  {project.description}
+                <p className="mt-2 text-sm leading-relaxed text-zinc-700">
+                  {project.summary}
                 </p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {project.tags.map((tag) => (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {project.stack.map((item) => (
                     <span
-                      key={tag}
-                      className="rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
+                      key={item}
+                      className="rounded-full border border-zinc-400/80 bg-[#ebe5da] px-2.5 py-1 text-xs text-zinc-700"
                     >
-                      {tag}
+                      {item}
                     </span>
                   ))}
                 </div>
-              </a>
+                <p className="mt-4 text-sm font-medium text-amber-700">
+                  Open project overview
+                </p>
+              </button>
             ))}
           </div>
         </section>
 
-        {/* Experience */}
-        <section className="mb-16">
-          <h2 className="mb-6 text-sm font-semibold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-            Experience
-          </h2>
-          <div className="flex flex-col gap-6">
+        <section className="mt-14">
+          <div className="flex items-end justify-between gap-4">
+            <h2 className="text-sm font-semibold uppercase tracking-[0.14em] text-zinc-500">
+              Blog & Writing
+            </h2>
+            <a
+              href={substack.publicationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-amber-700 hover:text-amber-800"
+            >
+              Visit Substack
+            </a>
+          </div>
+
+          <div className="mt-5 space-y-8">
             <div>
-              <div className="flex items-baseline justify-between">
-                <h3 className="font-semibold">Company Name</h3>
-                <span className="text-sm text-zinc-400 dark:text-zinc-500">
-                  2024 — Present
-                </span>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                Latest From Substack
+              </p>
+              <div className="mt-3 space-y-4">
+                {isLoadingPosts && (
+                  <p className="text-sm text-zinc-600">Loading recent posts...</p>
+                )}
+                {!isLoadingPosts && latestPosts.length === 0 && (
+                  <p className="text-sm text-zinc-600">
+                    More blog posts coming soon. In the meantime, visit my
+                    Substack for the latest writing.
+                  </p>
+                )}
+                {latestPosts.map((post) => (
+                  <article
+                    key={post.link}
+                    className="rounded-xl border border-zinc-300/85 bg-[#f2eee6]/85 p-5"
+                  >
+                    <div className="flex flex-col gap-2 sm:flex-row sm:items-baseline sm:justify-between">
+                      <h3 className="text-base font-semibold text-zinc-900">
+                        <a
+                          href={post.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="transition hover:text-amber-700"
+                        >
+                          {post.title}
+                        </a>
+                      </h3>
+                      <span className="shrink-0 text-xs font-medium uppercase tracking-wide text-zinc-500">
+                        {formatPublishedDate(post.publishedAt)}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-sm leading-relaxed text-zinc-700">
+                      {post.summary}
+                    </p>
+                  </article>
+                ))}
               </div>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Role / Title
-              </p>
-              <p className="mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                Brief description of what you did, technologies used, and impact
-                made.
-              </p>
             </div>
+
             <div>
-              <div className="flex items-baseline justify-between">
-                <h3 className="font-semibold">Another Company</h3>
-                <span className="text-sm text-zinc-400 dark:text-zinc-500">
-                  2022 — 2024
-                </span>
+              <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+                Posts I Recommend
+              </p>
+              <div className="mt-3 space-y-4">
+                {substack.curatedPosts.map((post) => (
+                  <article
+                    key={post.link}
+                    className="rounded-xl border border-zinc-300/85 bg-[#f2eee6]/85 p-5"
+                  >
+                    <div className="flex flex-col gap-1">
+                      <h3 className="text-base font-semibold text-zinc-900">
+                        <a
+                          href={post.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="transition hover:text-amber-700"
+                        >
+                          {post.title}
+                        </a>
+                      </h3>
+                      <p className="text-xs font-medium uppercase tracking-wide text-zinc-500">
+                        {post.author}
+                      </p>
+                    </div>
+                    <p className="mt-2 text-sm leading-relaxed text-zinc-700">
+                      {post.note}
+                    </p>
+                  </article>
+                ))}
               </div>
-              <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                Role / Title
-              </p>
-              <p className="mt-1 text-sm leading-relaxed text-zinc-600 dark:text-zinc-400">
-                Brief description of what you did at this position.
-              </p>
             </div>
           </div>
         </section>
 
-        {/* Footer */}
-        <footer className="border-t border-zinc-200 pt-8 dark:border-zinc-800">
-          <p className="text-sm text-zinc-400 dark:text-zinc-500">
-            &copy; {new Date().getFullYear()} Eugene Cho. All rights reserved.
-          </p>
+        <footer className="mt-14 border-t border-zinc-200/80 pt-8">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-zinc-600">
+              Contact: eugene [dot] t [dot] cho [at] gmail [dot] com
+            </p>
+            <a
+              href={substack.publicationUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-medium text-amber-700 transition hover:text-amber-800"
+            >
+              Follow on Substack
+            </a>
+          </div>
         </footer>
       </main>
+
+      {activeProject && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-8">
+          <button
+            type="button"
+            aria-label="Close project details"
+            onClick={() => setActiveProject(null)}
+            className="absolute inset-0 bg-zinc-900/45 backdrop-blur-[2px]"
+          />
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="project-modal-title"
+            className="relative z-10 w-full max-w-2xl rounded-2xl border border-zinc-300/90 bg-[#f3efe8] p-6 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.7)] sm:p-8"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+              Featured Project
+            </p>
+            <h3
+              id="project-modal-title"
+              className="mt-2 text-2xl font-semibold tracking-tight text-zinc-900"
+            >
+              {activeProject.title}
+            </h3>
+            <p className="mt-4 text-sm leading-relaxed text-zinc-700 sm:text-base">
+              {activeProject.summary}
+            </p>
+            <ul className="mt-5 space-y-2 text-sm leading-relaxed text-zinc-700">
+              {activeProject.details.map((detail) => (
+                <li key={detail} className="flex gap-2">
+                  <span className="mt-1.5 h-1.5 w-1.5 flex-none rounded-full bg-amber-600" />
+                  <span>{detail}</span>
+                </li>
+              ))}
+            </ul>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {activeProject.stack.map((item) => (
+                <span
+                  key={item}
+                  className="rounded-full border border-zinc-400/80 bg-[#ebe5da] px-2.5 py-1 text-xs text-zinc-700"
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+            <button
+              type="button"
+              onClick={() => setActiveProject(null)}
+              className="mt-6 rounded-full border border-zinc-400/80 bg-[#ebe5da] px-4 py-2 text-sm font-medium text-zinc-700 transition hover:border-zinc-600 hover:text-zinc-900"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
