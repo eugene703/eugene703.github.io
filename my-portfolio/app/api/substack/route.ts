@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { substack } from "../../data/siteContent";
 
+export const dynamic = "force-static";
+
 type FeedPost = {
   title: string;
   link: string;
@@ -8,7 +10,7 @@ type FeedPost = {
   summary: string;
 };
 
-const MAX_POSTS = 6;
+const POST_LIMIT = 3;
 
 function decodeEntities(input: string): string {
   return input
@@ -33,10 +35,10 @@ function extractTag(source: string, tag: string): string {
   return match?.[1]?.trim() ?? "";
 }
 
-function parseRss(xml: string, limit: number): FeedPost[] {
+function parseRss(xml: string): FeedPost[] {
   const items = xml.match(/<item[\s\S]*?<\/item>/gi) ?? [];
 
-  return items.slice(0, limit).map((item) => {
+  return items.slice(0, POST_LIMIT).map((item) => {
     const title = decodeEntities(extractTag(item, "title"));
     const link = decodeEntities(extractTag(item, "link"));
     const description = extractTag(item, "description");
@@ -51,32 +53,25 @@ function parseRss(xml: string, limit: number): FeedPost[] {
   });
 }
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const limitParam = Number(searchParams.get("limit") ?? "3");
-  const limit = Number.isFinite(limitParam)
-    ? Math.min(Math.max(limitParam, 1), MAX_POSTS)
-    : 3;
-
+export async function GET() {
   if (!substack.feedUrl.includes("substack.com")) {
-    return NextResponse.json({ posts: [], configured: false });
+    return NextResponse.json({ posts: [] });
   }
 
   try {
     const response = await fetch(substack.feedUrl, {
       headers: { Accept: "application/rss+xml, application/xml, text/xml" },
-      next: { revalidate: 3600 },
     });
 
     if (!response.ok) {
-      return NextResponse.json({ posts: [], configured: true });
+      return NextResponse.json({ posts: [] });
     }
 
     const xml = await response.text();
-    const posts = parseRss(xml, limit);
+    const posts = parseRss(xml);
 
-    return NextResponse.json({ posts, configured: true });
+    return NextResponse.json({ posts });
   } catch {
-    return NextResponse.json({ posts: [], configured: true });
+    return NextResponse.json({ posts: [] });
   }
 }

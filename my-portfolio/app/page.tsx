@@ -36,7 +36,7 @@ export default function Home() {
 
     async function loadLatestSubstackPosts() {
       try {
-        const response = await fetch("/api/substack?limit=3");
+        const response = await fetch("/api/substack");
         const data = (await response.json()) as {
           posts?: LatestPost[];
         };
