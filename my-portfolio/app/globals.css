@@ -1,24 +1,98 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f5f1;
-  --foreground: #171717;
+  --background: #060b14;
+  --foreground: #ffffff;
+  --muted-foreground: #d0e2f5;
+  --line: rgba(155, 214, 255, 0.35);
+  --line-strong: rgba(155, 214, 255, 0.55);
+  --surface: rgba(8, 14, 27, 0.9);
+  --surface-strong: rgba(13, 23, 44, 0.96);
+  --accent: #7be7ff;
+  --accent-strong: #b0f4ff;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-manrope);
+  --font-serif: var(--font-fraunces);
+  --font-mono: var(--font-jetbrains-mono);
 }
 
 body {
-  background: var(--background);
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at 8% 12%, rgba(35, 150, 255, 0.2), transparent 32%),
+    radial-gradient(circle at 92% 10%, rgba(17, 220, 255, 0.16), transparent 34%),
+    radial-gradient(circle at 72% 84%, rgba(58, 103, 255, 0.2), transparent 36%),
+    linear-gradient(160deg, #02040a 0%, #040916 50%, #02040a 100%);
   color: var(--foreground);
-  font-family: var(--font-sans), system-ui, -apple-system, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
 }
 
 ::selection {
-  background-color: #a16207;
-  color: #fff7ed;
+  background-color: var(--accent);
+  color: #03121f;
+}
+
+.shell {
+  border: 1px solid var(--line);
+  background: var(--surface);
+  box-shadow:
+    0 28px 72px -44px rgba(3, 12, 24, 0.92),
+    0 1px 0 rgba(145, 210, 255, 0.12) inset;
+  backdrop-filter: blur(8px);
+}
+
+.shell-strong {
+  border: 1px solid var(--line-strong);
+  background: var(--surface-strong);
+  box-shadow:
+    0 30px 78px -48px rgba(0, 0, 0, 0.95),
+    0 1px 0 rgba(145, 210, 255, 0.18) inset;
+}
+
+.eyebrow {
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: #b9d8f5;
+}
+
+.headline {
+  font-family: var(--font-serif), Georgia, serif;
+  font-weight: 700;
+  line-height: 1.06;
+}
+
+.chip {
+  border: 1px solid var(--line);
+  background: rgba(9, 29, 52, 0.82);
+  color: #f0f8ff;
+}
+
+.primary-link {
+  color: var(--accent);
+  transition: color 160ms ease;
+}
+
+.primary-link:hover {
+  color: var(--accent-strong);
+}
+
+.fade-up {
+  animation: fadeUp 520ms ease-out both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
